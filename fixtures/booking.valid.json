@@ -1,0 +1,32 @@
+{
+  "minimum": {
+    "eventType": "Private party",
+    "date": "+30",
+    "startTime": "19:00",
+    "venueName": "Naga City",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test@example.com"
+  },
+  "full": {
+    "eventType": "Corporate event",
+    "date": "+45",
+    "startTime": "20:00",
+    "endTime": "22:00",
+    "venueName": "Naga City",
+    "venueAddress": "123 Test Street, Naga City",
+    "guestCount": "50",
+    "notes": "Automated QA test booking - do not contact.",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test@example.com",
+    "contactPhone": "09170000000"
+  },
+  "pastMidnight": {
+    "eventType": "Wedding",
+    "date": "+60",
+    "startTime": "22:00",
+    "endTime": "01:00",
+    "venueName": "Naga City",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test@example.com"
+  }
+}

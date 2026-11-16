@@ -1,0 +1,28 @@
+{
+  "empty": {},
+  "invalidEmail": {
+    "eventType": "Private party",
+    "date": "+30",
+    "startTime": "19:00",
+    "venueName": "Naga City",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test-at-example.com"
+  },
+  "pastDate": {
+    "eventType": "Private party",
+    "date": "2020-01-01",
+    "startTime": "19:00",
+    "venueName": "Naga City",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test@example.com"
+  },
+  "honeypot": {
+    "eventType": "Private party",
+    "date": "+30",
+    "startTime": "19:00",
+    "venueName": "Naga City",
+    "contactName": "QA Test",
+    "contactEmail": "qa+test@example.com",
+    "honeypotValue": "https://spam.example.com"
+  }
+}

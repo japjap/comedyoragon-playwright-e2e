@@ -1,9 +1,11 @@
 import { type Locator, type Page } from "@playwright/test";
 
+import { manilaDate } from "../helpers/dates";
+
 /** Shape of the entries in fixtures/booking.*.json. */
 export interface BookingData {
   eventType?: string; // visible option label, e.g. "Private party"
-  date?: string; // YYYY-MM-DD, or "+N" for N days from today
+  date?: string; // YYYY-MM-DD, or "+N" for N days from today (Manila)
   startTime?: string; // HH:MM
   endTime?: string;
   venueName?: string;
@@ -15,6 +17,12 @@ export interface BookingData {
   contactPhone?: string;
   honeypotValue?: string; // only for BK-07
 }
+
+/**
+ * Labels render as "Date *" (asterisk hidden from assistive tech) or
+ * "End time (optional)", so match the label text plus exactly those suffixes.
+ */
+const label = (text: string) => new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")}( \\*| \\(optional\\))?$`);
 
 export class BookingPage {
   readonly page: Page;
@@ -32,40 +40,45 @@ export class BookingPage {
   readonly contactPhone: Locator;
   readonly honeypot: Locator;
   readonly submitButton: Locator;
-  readonly successHeading: Locator;
+  readonly formAlert: Locator;
   readonly errorBanner: Locator;
+  readonly successHeading: Locator;
+  readonly seeUpcomingShowsLink: Locator;
+  readonly backToHomeLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.heading = page.getByRole("heading", { level: 1, name: "Request a Booking" });
-    this.eventType = page.getByLabel("Type of event");
-    this.date = page.getByLabel("Date", { exact: true });
-    this.startTime = page.getByLabel("Start time");
-    this.endTime = page.getByLabel("End time");
-    this.venueName = page.getByLabel("Venue or city");
-    this.venueAddress = page.getByLabel("Venue address");
-    this.guestCount = page.getByLabel("Expected guests");
-    this.notes = page.getByLabel("Tell us about your event");
-    this.contactName = page.getByLabel("Your name");
-    this.contactEmail = page.getByLabel("Email");
-    this.contactPhone = page.getByLabel("Phone");
+    this.eventType = page.getByLabel(label("Type of event"));
+    this.date = page.getByLabel(label("Date"));
+    this.startTime = page.getByLabel(label("Start time"));
+    this.endTime = page.getByLabel(label("End time"));
+    this.venueName = page.getByLabel(label("Venue or city"));
+    this.venueAddress = page.getByLabel(label("Venue address"));
+    this.guestCount = page.getByLabel(label("Expected guests"));
+    this.notes = page.getByLabel(label("Tell us about your event"));
+    this.contactName = page.getByLabel(label("Your name"));
+    this.contactEmail = page.getByLabel(label("Email"));
+    this.contactPhone = page.getByLabel(label("Phone"));
     this.honeypot = page.getByLabel("Leave this field empty");
     this.submitButton = page.getByRole("button", { name: /Send Booking Request|Sending request/ });
+    this.formAlert = page.getByRole("main").getByRole("alert");
+    this.errorBanner = this.formAlert.filter({
+      hasText: "Something went wrong sending your request. Please try again.",
+    });
     this.successHeading = page.getByRole("heading", { name: "Booking request received" });
-    this.errorBanner = page.getByText("Something went wrong sending your request. Please try again.");
+    this.seeUpcomingShowsLink = page.getByRole("main").getByRole("link", { name: "See Upcoming Shows" });
+    this.backToHomeLink = page.getByRole("main").getByRole("link", { name: "Back to home" });
   }
 
   async goto() {
     await this.page.goto("/book");
   }
 
-  /** Turns "+N" into the date N days from today (YYYY-MM-DD) so fixtures never go stale. */
+  /** Turns "+N" into the Manila date N days from today (YYYY-MM-DD) so fixtures never go stale. */
   static resolveDate(value: string): string {
     const match = /^\+(\d+)$/.exec(value);
-    if (!match) return value;
-    const d = new Date();
-    d.setDate(d.getDate() + Number(match[1]));
-    return d.toISOString().slice(0, 10);
+    return match ? manilaDate(Number(match[1])) : value;
   }
 
   async fill(data: BookingData) {
